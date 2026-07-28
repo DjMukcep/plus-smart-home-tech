@@ -1,4 +1,4 @@
-package model.sensor_event;
+package ru.yandex.practicum.telemetry.collector.model.sensor_event;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class ClimateSensorEvent extends SensorEvent {
     @NotNull
     private Integer humidity;
     @NotNull
-    private Integer co2Value;
+    private Integer co2Level;
 
     @Override
     public SensorEventType getType() {

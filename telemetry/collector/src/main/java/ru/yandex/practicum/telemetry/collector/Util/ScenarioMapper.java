@@ -1,8 +1,8 @@
-package Util;
+package ru.yandex.practicum.telemetry.collector.Util;
 
 import lombok.experimental.UtilityClass;
-import model.hub_event.DeviceAction;
-import model.hub_event.ScenarioCondition;
+import ru.yandex.practicum.telemetry.collector.model.hub_event.DeviceAction;
+import ru.yandex.practicum.telemetry.collector.model.hub_event.ScenarioCondition;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
 import java.util.List;

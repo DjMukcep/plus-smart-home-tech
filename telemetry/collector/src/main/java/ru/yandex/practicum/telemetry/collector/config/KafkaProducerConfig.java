@@ -1,4 +1,4 @@
-package config;
+package ru.yandex.practicum.telemetry.collector.config;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.KafkaProducer;
