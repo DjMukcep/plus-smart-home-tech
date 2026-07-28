@@ -1,11 +1,11 @@
-package controller;
+package ru.yandex.practicum.telemetry.collector.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import model.hub_event.HubEvent;
-import model.sensor_event.SensorEvent;
+import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEvent;
+import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
 import org.springframework.web.bind.annotation.*;
-import service.EventService;
+import ru.yandex.practicum.telemetry.collector.service.EventService;
 
 @RestController
 @RequestMapping(path = "/events")

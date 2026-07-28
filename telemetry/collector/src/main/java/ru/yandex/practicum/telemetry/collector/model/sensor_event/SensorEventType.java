@@ -1,4 +1,4 @@
-package model.sensor_event;
+package ru.yandex.practicum.telemetry.collector.model.sensor_event;
 
 public enum SensorEventType {
     MOTION_SENSOR_EVENT,

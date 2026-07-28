@@ -1,4 +1,34 @@
 package ru.yandex.practicum.telemetry.collector.service.strategy.sensor;
 
-public class ClimateSensorEventHandler {
+import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.producer.Producer;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
+import ru.yandex.practicum.telemetry.collector.model.sensor_event.ClimateSensorEvent;
+import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
+import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEventType;
+import ru.yandex.practicum.telemetry.collector.service.strategy.Event;
+
+@Component
+public class ClimateSensorEventHandler extends Event implements SensorEventHandler {
+
+    public ClimateSensorEventHandler(Producer<String, SpecificRecordBase> producer) {
+        super(producer);
+    }
+
+    @Override
+    public SensorEventType getSensorEventType() {
+        return SensorEventType.CLIMATE_SENSOR_EVENT;
+    }
+
+    @Override
+    public void handle(SensorEvent sensorEvent, String topic) {
+        ClimateSensorEvent event = (ClimateSensorEvent) sensorEvent;
+        ClimateSensorAvro payload = ClimateSensorAvro.newBuilder()
+                .setTemperatureC(event.getTemperatureC())
+                .setHumidity(event.getHumidity())
+                .setCo2Level(event.getCo2Level())
+                .build();
+        sendMessage(topic,createSensorEvent(event,payload));
+    }
 }

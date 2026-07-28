@@ -1,4 +1,4 @@
-package model.sensor_event;
+package ru.yandex.practicum.telemetry.collector.model.sensor_event;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

@@ -1,4 +1,4 @@
-package model.hub_event;
+package ru.yandex.practicum.telemetry.collector.model.hub_event;
 
 
 import jakarta.validation.constraints.Size;
