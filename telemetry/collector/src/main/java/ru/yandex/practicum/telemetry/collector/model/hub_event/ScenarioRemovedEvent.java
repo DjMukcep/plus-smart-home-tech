@@ -15,7 +15,7 @@ public class ScenarioRemovedEvent extends HubEvent {
     private String name;
 
     @Override
-    public HubEventType geType() {
+    public HubEventType getType() {
         return HubEventType.SCENARIO_REMOVED;
     }
 }

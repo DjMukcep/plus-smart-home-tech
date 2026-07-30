@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import serializer.AvroSerializer;
@@ -12,7 +13,8 @@ import serializer.AvroSerializer;
 import java.util.Properties;
 
 @Configuration
-public class KafkaProducerConfig {
+@EnableConfigurationProperties(KafkaTopicsProperties.class)
+public class KafkaConfig {
 
     @Bean
     public Producer<String, SpecificRecordBase> avroProducer() {

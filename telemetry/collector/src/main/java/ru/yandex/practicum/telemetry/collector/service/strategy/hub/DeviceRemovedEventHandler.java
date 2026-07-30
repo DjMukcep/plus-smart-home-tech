@@ -1,9 +1,10 @@
-package ru.yandex.practicum.telemetry.collector.service.strategy.Hub;
+package ru.yandex.practicum.telemetry.collector.service.strategy.hub;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.DeviceRemovedEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEventType;
@@ -24,9 +25,12 @@ public class DeviceRemovedEventHandler extends Event implements HubEventHandler 
     @Override
     public void handle(HubEvent hubEvent, String topic) {
         DeviceRemovedEvent event = (DeviceRemovedEvent) hubEvent;
+
         DeviceRemovedEventAvro payload = DeviceRemovedEventAvro.newBuilder()
                 .setId(event.getId())
                 .build();
-        sendMessage(topic, createHubEventAvro(event,payload));
+
+        HubEventAvro message = createHubEventAvro(event,payload);
+        sendMessage(topic, message.getHubId(), message.getTimestamp(),message);
     }
 }

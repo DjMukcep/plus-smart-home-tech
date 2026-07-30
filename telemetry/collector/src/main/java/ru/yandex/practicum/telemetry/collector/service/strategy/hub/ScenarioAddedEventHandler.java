@@ -1,10 +1,11 @@
-package ru.yandex.practicum.telemetry.collector.service.strategy.Hub;
+package ru.yandex.practicum.telemetry.collector.service.strategy.hub;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
-import ru.yandex.practicum.telemetry.collector.Util.ScenarioMapper;
+import ru.yandex.practicum.telemetry.collector.util.ScenarioMapper;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.ScenarioAddedEvent;
@@ -25,11 +26,14 @@ public class ScenarioAddedEventHandler extends Event implements HubEventHandler 
     @Override
     public void handle(HubEvent hubEvent, String topic) {
         ScenarioAddedEvent event = (ScenarioAddedEvent) hubEvent;
+
         ScenarioAddedEventAvro payload = ScenarioAddedEventAvro.newBuilder()
                 .setName(event.getName())
                 .setConditions(ScenarioMapper.toScenarioConditionAvro(event.getConditions()))
                 .setActions(ScenarioMapper.toDeviceActionAvro(event.getActions()))
                 .build();
-        sendMessage(topic, createHubEventAvro(event,payload));
+
+        HubEventAvro message = createHubEventAvro(event,payload);
+        sendMessage(topic, message.getHubId(), message.getTimestamp(),message);
     }
 }

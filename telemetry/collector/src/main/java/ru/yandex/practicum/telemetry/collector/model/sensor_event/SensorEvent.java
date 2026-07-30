@@ -16,8 +16,7 @@ import java.time.Instant;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        defaultImpl = SensorEventType.class
+        property = "type"
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = LightSensorEvent.class, name = "LIGHT_SENSOR_EVENT"),

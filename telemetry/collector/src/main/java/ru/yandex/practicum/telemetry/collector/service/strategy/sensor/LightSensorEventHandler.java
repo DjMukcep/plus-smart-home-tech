@@ -4,6 +4,7 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.LightSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEventType;
@@ -24,10 +25,13 @@ public class LightSensorEventHandler extends Event implements SensorEventHandler
     @Override
     public void handle(SensorEvent sensorEvent, String topic) {
         LightSensorEvent event = (LightSensorEvent) sensorEvent;
+
         LightSensorAvro payload = LightSensorAvro.newBuilder()
                 .setLinkQuality(event.getLinkQuality())
                 .setLuminosity(event.getLuminosity())
                 .build();
-        sendMessage(topic, createSensorEvent(event, payload));
+
+        SensorEventAvro message = createSensorEvent(event, payload);
+        sendMessage(topic, message.getHubId(), message.getTimestamp(), message);
     }
 }

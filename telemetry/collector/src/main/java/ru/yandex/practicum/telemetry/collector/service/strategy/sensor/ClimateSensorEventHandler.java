@@ -4,6 +4,7 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.ClimateSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEventType;
@@ -24,11 +25,14 @@ public class ClimateSensorEventHandler extends Event implements SensorEventHandl
     @Override
     public void handle(SensorEvent sensorEvent, String topic) {
         ClimateSensorEvent event = (ClimateSensorEvent) sensorEvent;
+
         ClimateSensorAvro payload = ClimateSensorAvro.newBuilder()
                 .setTemperatureC(event.getTemperatureC())
                 .setHumidity(event.getHumidity())
                 .setCo2Level(event.getCo2Level())
                 .build();
-        sendMessage(topic,createSensorEvent(event,payload));
+
+        SensorEventAvro message = createSensorEvent(event,payload);
+        sendMessage(topic, message.getHubId(),  message.getTimestamp(), message);
     }
 }

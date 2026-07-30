@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.Util;
+package ru.yandex.practicum.telemetry.collector.util;
 
 import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.DeviceAction;

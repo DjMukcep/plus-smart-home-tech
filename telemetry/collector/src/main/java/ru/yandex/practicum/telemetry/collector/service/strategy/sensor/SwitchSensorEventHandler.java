@@ -3,6 +3,7 @@ package ru.yandex.practicum.telemetry.collector.service.strategy.sensor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEventType;
@@ -24,9 +25,12 @@ public class SwitchSensorEventHandler extends Event implements SensorEventHandle
     @Override
     public void handle(SensorEvent sensorEvent, String topic) {
         SwitchSensorEvent event = (SwitchSensorEvent) sensorEvent;
+
         SwitchSensorAvro payload = SwitchSensorAvro.newBuilder()
                 .setState(event.getState())
                 .build();
-        sendMessage(topic,createSensorEvent(event,payload));
+
+        SensorEventAvro message = createSensorEvent(event,payload);
+        sendMessage(topic,  message.getHubId(), message.getTimestamp(), message);
     }
 }

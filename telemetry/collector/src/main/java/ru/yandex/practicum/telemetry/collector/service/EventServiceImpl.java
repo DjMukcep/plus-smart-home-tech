@@ -2,10 +2,10 @@ package ru.yandex.practicum.telemetry.collector.service;
 
 import org.springframework.stereotype.Service;
 
-import ru.yandex.practicum.kafka.telemetry.event.*;
+import ru.yandex.practicum.telemetry.collector.config.KafkaTopicsProperties;
 import ru.yandex.practicum.telemetry.collector.model.hub_event.*;
 import ru.yandex.practicum.telemetry.collector.model.sensor_event.*;
-import ru.yandex.practicum.telemetry.collector.service.strategy.Hub.HubEventHandler;
+import ru.yandex.practicum.telemetry.collector.service.strategy.hub.HubEventHandler;
 import ru.yandex.practicum.telemetry.collector.service.strategy.sensor.SensorEventHandler;
 
 import java.util.List;
@@ -19,25 +19,26 @@ public class EventServiceImpl implements EventService {
 
     private final Map<SensorEventType, SensorEventHandler> sensorEventHandlers;
     private final Map<HubEventType, HubEventHandler> hubEventHandlers;
+    private final KafkaTopicsProperties topics;
 
     public EventServiceImpl(List<SensorEventHandler> sensorHandlers,
-                            List<HubEventHandler> hubHandlers) {
+                            List<HubEventHandler> hubHandlers,
+                            KafkaTopicsProperties topics) {
         this.sensorEventHandlers = initEventHandlers(
                 sensorHandlers,SensorEventHandler::getSensorEventType);
         this.hubEventHandlers = initEventHandlers(
                 hubHandlers,HubEventHandler::getHubEventType);
+        this.topics = topics;
     }
 
     @Override
     public void publishSensorEvent(SensorEvent event) {
-        String topic = "telemetry.sensors.v1";
-        sensorEventHandlers.get(event.getType()).handle(event, topic);
+        sensorEventHandlers.get(event.getType()).handle(event, topics.sensors());
     }
 
     @Override
     public void publishHubEvent(HubEvent event) {
-        String topic = "telemetry.hubs.v1";
-        hubEventHandlers.get(event.geType()).handle(event, topic);
+        hubEventHandlers.get(event.getType()).handle(event, topics.hubs());
     }
 
     private <K, H> Map<K, H> initEventHandlers(List<H> handlers, Function<H, K> keyExtractor) {

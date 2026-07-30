@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.collector.service.strategy.Hub;
+package ru.yandex.practicum.telemetry.collector.service.strategy.hub;
 
 import org.apache.avro.specific.SpecificRecordBase;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;

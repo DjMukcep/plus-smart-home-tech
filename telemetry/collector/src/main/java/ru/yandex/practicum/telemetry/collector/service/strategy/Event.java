@@ -7,14 +7,18 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
+import java.time.Instant;
+
 @RequiredArgsConstructor
 @Slf4j
 public abstract class Event {
 
     private final Producer<String, SpecificRecordBase> producer;
 
-    protected void sendMessage(String topic, SpecificRecordBase message) {
-        producer.send(new ProducerRecord<>(topic, message), this::onMessageSent);
+    protected void sendMessage(String topic, String hubId, Instant timestamp, SpecificRecordBase message) {
+        producer.send(
+                new ProducerRecord<>(topic, null, timestamp.toEpochMilli(), hubId, message),
+                this::onMessageSent);
     }
 
     private void onMessageSent(RecordMetadata metadata, Exception ex) {

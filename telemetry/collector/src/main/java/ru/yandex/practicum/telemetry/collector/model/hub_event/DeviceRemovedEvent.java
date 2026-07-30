@@ -14,7 +14,7 @@ public class DeviceRemovedEvent extends HubEvent {
     private String id;
 
     @Override
-    public HubEventType geType() {
+    public HubEventType getType() {
         return HubEventType.DEVICE_REMOVED;
     }
 }
