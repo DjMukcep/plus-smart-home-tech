@@ -16,6 +16,7 @@ public class KafkaProducerCloser {
 
     @PreDestroy
     public void shutdown() {
+        producer.flush();
         producer.close(Duration.ofSeconds(5));
     }
 }
