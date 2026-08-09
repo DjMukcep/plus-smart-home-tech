@@ -1,36 +1,30 @@
 package ru.yandex.practicum.telemetry.collector.service.strategy.hub;
 
-import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.Producer;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import ru.yandex.practicum.grpc.telemetry.event.DeviceRemovedEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.telemetry.collector.model.hub_event.DeviceRemovedEvent;
-import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEvent;
-import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEventType;
-import ru.yandex.practicum.telemetry.collector.service.strategy.Event;
+import ru.yandex.practicum.telemetry.collector.service.strategy.KafkaEventSender;
 
-@Component
-public class DeviceRemovedEventHandler extends Event implements HubEventHandler {
+@Component(value = "DEVICE_REMOVED")
+@RequiredArgsConstructor
+public class DeviceRemovedEventHandler implements HubEventHandler {
 
-    public DeviceRemovedEventHandler(Producer<String, SpecificRecordBase> producer) {
-        super(producer);
-    }
+    private final KafkaEventSender eventSender;
 
     @Override
-    public HubEventType getHubEventType() {
-        return HubEventType.DEVICE_REMOVED;
-    }
-
-    @Override
-    public void handle(HubEvent hubEvent, String topic) {
-        DeviceRemovedEvent event = (DeviceRemovedEvent) hubEvent;
+    public void handle(HubEventProto hubEvent, String topic) {
+        DeviceRemovedEventProto event = hubEvent.getDeviceRemoved();
 
         DeviceRemovedEventAvro payload = DeviceRemovedEventAvro.newBuilder()
                 .setId(event.getId())
                 .build();
 
-        HubEventAvro message = createHubEventAvro(event,payload);
-        sendMessage(topic, message.getHubId(), message.getTimestamp(),message);
+        HubEventAvro message = createHubEventAvro(hubEvent,payload);
+        eventSender.sendMessage(topic, message.getHubId(), message.getTimestamp(),message);
     }
 }

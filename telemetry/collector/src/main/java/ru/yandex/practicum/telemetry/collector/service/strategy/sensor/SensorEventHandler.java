@@ -1,21 +1,23 @@
 package ru.yandex.practicum.telemetry.collector.service.strategy.sensor;
 
 import org.apache.avro.specific.SpecificRecordBase;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEventType;
+
+import java.time.Instant;
 
 public interface SensorEventHandler {
 
-    SensorEventType getSensorEventType();
+    void handle(SensorEventProto sensorEvent, String topic);
 
-    void handle(SensorEvent sensorEvent, String topic);
-
-    default SensorEventAvro createSensorEvent(SensorEvent event, SpecificRecordBase payload) {
+    default <T extends SensorEventProto> SensorEventAvro createSensorEvent(T event, SpecificRecordBase payload) {
         return SensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(Instant.ofEpochSecond(
+                        event.getTimestamp().getSeconds(),
+                        event.getTimestamp().getNanos())
+                )
                 .setPayload(payload)
                 .build();
     }

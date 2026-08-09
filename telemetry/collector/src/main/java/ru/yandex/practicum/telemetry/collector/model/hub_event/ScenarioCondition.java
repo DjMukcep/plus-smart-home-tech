@@ -8,10 +8,12 @@ import lombok.Data;
 public class ScenarioCondition {
     @NotBlank
     private String sensorId;
+
     @NotNull
     private ConditionType type;
+
     @NotNull
     private OperationType operation;
-    @NotNull
-    private Integer value;
+
+    private Object value;
 }

@@ -1,39 +1,33 @@
 package ru.yandex.practicum.telemetry.collector.service.strategy.hub;
 
-import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.Producer;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.ScenarioAddedEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
 import ru.yandex.practicum.telemetry.collector.util.ScenarioMapper;
-import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEvent;
-import ru.yandex.practicum.telemetry.collector.model.hub_event.HubEventType;
-import ru.yandex.practicum.telemetry.collector.model.hub_event.ScenarioAddedEvent;
-import ru.yandex.practicum.telemetry.collector.service.strategy.Event;
+import ru.yandex.practicum.telemetry.collector.service.strategy.KafkaEventSender;
 
-@Component
-public class ScenarioAddedEventHandler extends Event implements HubEventHandler {
+@Component(value = "SCENARIO_ADDED")
+@RequiredArgsConstructor
+public class ScenarioAddedEventHandler implements HubEventHandler {
 
-    public ScenarioAddedEventHandler(Producer<String, SpecificRecordBase> producer) {
-        super(producer);
-    }
+    private final KafkaEventSender eventSender;
 
     @Override
-    public HubEventType getHubEventType() {
-        return HubEventType.SCENARIO_ADDED;
-    }
-
-    @Override
-    public void handle(HubEvent hubEvent, String topic) {
-        ScenarioAddedEvent event = (ScenarioAddedEvent) hubEvent;
+    public void handle(HubEventProto hubEvent, String topic) {
+        ScenarioAddedEventProto event = hubEvent.getScenarioAdded();
 
         ScenarioAddedEventAvro payload = ScenarioAddedEventAvro.newBuilder()
                 .setName(event.getName())
-                .setConditions(ScenarioMapper.toScenarioConditionAvro(event.getConditions()))
-                .setActions(ScenarioMapper.toDeviceActionAvro(event.getActions()))
+                .setConditions(ScenarioMapper.toScenarioConditionAvro(event.getConditionList()))
+                .setActions(ScenarioMapper.toDeviceActionAvro(event.getActionList()))
                 .build();
 
-        HubEventAvro message = createHubEventAvro(event,payload);
-        sendMessage(topic, message.getHubId(), message.getTimestamp(),message);
+        HubEventAvro message = createHubEventAvro(hubEvent,payload);
+        eventSender.sendMessage(topic, message.getHubId(), message.getTimestamp(),message);
     }
 }
