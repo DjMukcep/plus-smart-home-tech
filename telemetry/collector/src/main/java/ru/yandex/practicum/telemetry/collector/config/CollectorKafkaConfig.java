@@ -14,7 +14,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableConfigurationProperties(KafkaTopicsProperties.class)
-public class KafkaConfig {
+public class CollectorKafkaConfig {
 
     @Bean
     public Producer<String, SpecificRecordBase> avroProducer() {

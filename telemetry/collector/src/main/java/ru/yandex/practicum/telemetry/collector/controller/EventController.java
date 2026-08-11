@@ -5,8 +5,6 @@ import io.grpc.Status;
 
 import io.grpc.stub.StreamObserver;
 
-import org.springframework.web.bind.annotation.*;
-
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
@@ -52,7 +50,6 @@ public class EventController extends CollectorControllerImplBase {
             StreamObserver<Empty> responseObserver,
             BiConsumer<String, String> handlerExecutor) {
         try {
-            System.out.println("Processing event " + eventKey);
             handlerExecutor.accept(eventKey, topic);
 
             responseObserver.onNext(Empty.getDefaultInstance());
