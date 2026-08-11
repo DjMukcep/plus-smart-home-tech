@@ -4,17 +4,14 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.aggregator.deserializer.BaseAvroDeserializer;
-import ru.yandex.practicum.telemetry.collector.config.KafkaTopicsProperties;
 
 import java.util.Properties;
 
 @Configuration
-@EnableConfigurationProperties(KafkaTopicsProperties.class)
 public class AggregatorKafkaConfig {
 
     @Bean
