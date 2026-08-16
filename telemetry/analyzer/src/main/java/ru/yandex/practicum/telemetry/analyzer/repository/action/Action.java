@@ -1,15 +1,16 @@
-package ru.yandex.practicum.telemetry.analyzer.repository;
+package ru.yandex.practicum.telemetry.analyzer.repository.action;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @ToString
 @Table(name = "actions")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Action {
 
     @Id

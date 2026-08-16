@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.analyzer.processor;
+package ru.yandex.practicum.telemetry.analyzer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.analyzer.repository.action.Action;
 import ru.yandex.practicum.telemetry.analyzer.repository.action.ActionType;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 @EnableJpaRepositories(basePackages = "ru.yandex.practicum.telemetry.analyzer.repository")
 public class HubEventProcessor implements Runnable {
@@ -104,16 +104,23 @@ public class HubEventProcessor implements Runnable {
         String hubId = eventAvro.getHubId();
         Object payload = eventAvro.getPayload();
 
-        if (payload instanceof DeviceAddedEventAvro deviceAddedEvent) {
-            processDeviceAddedEvent(hubId, deviceAddedEvent);
-        } else if (payload instanceof DeviceRemovedEventAvro deviceRemovedEvent) {
-            processDeviceRemovedEvent(hubId, deviceRemovedEvent);
-        } else if (payload instanceof ScenarioAddedEventAvro scenarioAddedEvent) {
-            processScenarioAddedEvent(hubId, scenarioAddedEvent);
-        } else if (payload instanceof ScenarioRemovedEventAvro scenarioRemovedEvent) {
-            processScenarioRemovedEvent(hubId, scenarioRemovedEvent);
-        }
+        processEventAvro(payload, hubId);
 
+    }
+
+    private void processEventAvro(Object payload, String hubId) {
+        switch (payload) {
+            case DeviceAddedEventAvro deviceAddedEvent ->
+                    processDeviceAddedEvent(hubId, deviceAddedEvent);
+            case DeviceRemovedEventAvro deviceRemovedEvent ->
+                    processDeviceRemovedEvent(hubId, deviceRemovedEvent);
+            case ScenarioAddedEventAvro scenarioAddedEvent ->
+                    processScenarioAddedEvent(hubId, scenarioAddedEvent);
+            case ScenarioRemovedEventAvro scenarioRemovedEvent ->
+                    processScenarioRemovedEvent(hubId, scenarioRemovedEvent);
+            case null -> log.warn("Получен пустой payload для хаба {}", hubId);
+            default -> log.error("Неизвестный тип события: {}", payload.getClass().getName());
+        }
     }
 
     private void processDeviceAddedEvent(String hubId,DeviceAddedEventAvro event) {

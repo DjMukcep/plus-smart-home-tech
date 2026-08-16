@@ -10,6 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.errors.WakeupException;
 
 import org.springframework.stereotype.Component;
@@ -50,8 +51,7 @@ public class AggregationStarter {
 
     private void consumeEvents() {
         while (true) {
-            ConsumerRecords<String, SensorEventAvro> records =
-                    consumer.poll(CONSUME_ATTEMPT_TIMEOUT);
+            ConsumerRecords<String, SensorEventAvro> records = consumer.poll(CONSUME_ATTEMPT_TIMEOUT);
 
             if (!records.isEmpty()) {
                 processRecords(records);
@@ -79,15 +79,27 @@ public class AggregationStarter {
         );
     }
 
-    private void sendSnapshot(
-            String hubId,
-            SensorsSnapshotAvro snapshot
-    ) {
+    private void sendSnapshot(String hubId, SensorsSnapshotAvro snapshot) {
         producer.send(new ProducerRecord<>(
                 topics.snapshots(),
+                null,
+                snapshot.getTimestamp().toEpochMilli(),
                 hubId,
-                snapshot
-        ));
+                snapshot),
+                this::onMessageSent
+        );
+    }
+
+    private void onMessageSent(RecordMetadata metadata, Exception ex) {
+        if (ex != null) {
+            log.error(
+                    "Ошибка отправки сообщения в топик {}",
+                    metadata != null ? metadata.topic() : "unknown", ex
+            );
+        } else  {
+            log.info("Сообщение отправлено. topic={}, partition={}, offset={}",
+                    metadata.topic(), metadata.partition(), metadata.offset());
+        }
     }
 
     private void subscribe() {

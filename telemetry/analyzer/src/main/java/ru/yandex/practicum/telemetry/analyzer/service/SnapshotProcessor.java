@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.analyzer.processor;
+package ru.yandex.practicum.telemetry.analyzer.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,7 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.analyzer.repository.action.Action;
 import ru.yandex.practicum.telemetry.analyzer.repository.condition.Condition;
@@ -14,18 +14,20 @@ import ru.yandex.practicum.telemetry.analyzer.repository.condition.ConditionOper
 import ru.yandex.practicum.telemetry.analyzer.repository.condition.ConditionType;
 import ru.yandex.practicum.telemetry.analyzer.repository.scenario.Scenario;
 import ru.yandex.practicum.telemetry.analyzer.repository.scenario.ScenarioRepository;
-import ru.yandex.practicum.telemetry.analyzer.service.AnalyzerClient;
+import ru.yandex.practicum.telemetry.analyzer.proxy.AnalyzerClient;
 import ru.yandex.practicum.telemetry.collector.config.KafkaTopicsProperties;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static ru.yandex.practicum.telemetry.analyzer.repository.condition.ConditionType.*;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class SnapshotProcessor {
 
@@ -80,72 +82,55 @@ public class SnapshotProcessor {
     }
 
     private void processRecords(ConsumerRecords<String, SensorsSnapshotAvro> records) {
-        for (ConsumerRecord<String, SensorsSnapshotAvro> record : records) {
-            if (record == null) {
-                continue;
-            }
+        StreamSupport.stream(records.spliterator(), false)
+                .filter(Objects::nonNull)
+                .map(ConsumerRecord::value)
+                .filter(Objects::nonNull)
+                .flatMap(snapshot -> scenarioRepository.findByHubId(snapshot.getHubId()).stream()
+                        .filter(scenario -> areAllConditionsMet(scenario, snapshot))
+                        .map(scenario -> new ScenarioTask(scenario, snapshot)))
+                .flatMap(task -> {
+                    Map<String, Action> actions = task.scenario.getActions();
+                    if (actions == null) return Stream.empty();
 
-            processRecord(record.value());
-        }
+                    return actions.entrySet().stream()
+                            .map(entry -> new ActionExecution(
+                                    task.snapshot.getHubId(),
+                                    task.scenario().getName(),
+                                    entry.getKey(),
+                                    entry.getValue()));
+                })
+                .forEach(actionExecution -> analyzerClient.sendActionToHub(
+                        actionExecution.hubId(),
+                        actionExecution.scenarioName(),
+                        actionExecution.sensorId(),
+                        actionExecution.action()));
     }
 
-    private void processRecord(SensorsSnapshotAvro eventAvro) {
-        if (eventAvro == null) {
-            return;
+    private boolean areAllConditionsMet(Scenario scenario, SensorsSnapshotAvro snapshot) {
+        Map<String, Condition> conditions = scenario.getConditions();
+
+        if (conditions == null || conditions.isEmpty() || snapshot.getSensorsState() == null) {
+            return false;
         }
 
-        String hubId = eventAvro.getHubId();
-        List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
-
-        if (scenarios.isEmpty()) {
-            return;
-        }
-
-        for (Scenario scenario : scenarios) {
-            Map<String, Condition> conditions = scenario.getConditions();
-
-            if (conditions == null || conditions.isEmpty()) {
-                continue;
-            }
-
-            boolean allConditionsMatched = true;
-
-            for (Map.Entry<String, Condition> entry : conditions.entrySet()) {
-                if (entry.getValue() == null) {
-                    continue;
-                }
-
-                String sensorId = entry.getKey();
-                Condition condition = entry.getValue();
-
-                SensorStateAvro sensorStateAvro = eventAvro.getSensorsState().get(sensorId);
-
-                if (sensorStateAvro == null || sensorStateAvro.getData() == null) {
-                    continue;
-                }
-
-                boolean matched = processSensor(sensorStateAvro.getData(), condition);
-
-                if (!matched) {
-                    allConditionsMatched = false;
-                    break;
-                }
-            }
-
-            if (allConditionsMatched) {
-                Map<String, Action> actions = scenario.getActions();
-                if (actions == null || actions.isEmpty()) {
-                    continue;
-                }
-                for (Map.Entry<String, Action> entry : actions.entrySet()) {
+        return conditions.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .allMatch(entry -> {
                     String sensorId = entry.getKey();
-                    Action action = entry.getValue();
-                    String scenarioName = scenario.getName();
-                    analyzerClient.sendActionToHub(hubId, scenarioName, sensorId, action);
-                }
-            }
-        }
+                    Condition condition = entry.getValue();
+                    SensorStateAvro sensorState = snapshot.getSensorsState().get(sensorId);
 
+                    return sensorState != null
+                            && sensorState.getData() != null
+                            && processSensor(sensorState.getData(), condition);
+                });
+    }
+
+    private record ScenarioTask(Scenario scenario, SensorsSnapshotAvro snapshot) {
+    }
+
+    private record ActionExecution(String hubId, String scenarioName, String sensorId, Action action) {
     }
 
     private boolean processSensor(Object data, Condition condition) {
@@ -243,7 +228,7 @@ public class SnapshotProcessor {
 
     private boolean checkBooleanCondition(ConditionOperation operation, Object sensorValue, Integer targetValue) {
         Boolean sensorValueBoolean = sensorValue instanceof Boolean ? (Boolean) sensorValue : null;
-        Boolean targetValueBoolean  = targetValue == null ? null : targetValue == 1;
+        Boolean targetValueBoolean = targetValue == null ? null : targetValue == 1;
 
         if (sensorValueBoolean == null || targetValueBoolean == null) {
             return false;

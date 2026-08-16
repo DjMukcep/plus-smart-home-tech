@@ -1,4 +1,9 @@
 package ru.yandex.practicum.telemetry.aggregator.deserializer;
 
-public class SensorSnapshotDeserializer {
+import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+
+public class SensorSnapshotDeserializer extends BaseAvroDeserializer<SensorsSnapshotAvro>{
+    public SensorSnapshotDeserializer() {
+        super(SensorsSnapshotAvro.getClassSchema());
+    }
 }

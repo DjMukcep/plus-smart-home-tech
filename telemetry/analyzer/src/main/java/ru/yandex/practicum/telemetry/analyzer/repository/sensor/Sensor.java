@@ -1,20 +1,20 @@
-package ru.yandex.practicum.telemetry.analyzer.repository;
+package ru.yandex.practicum.telemetry.analyzer.repository.sensor;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @ToString
 @Table(name = "sensors")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Sensor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(nullable = false, name = "hub_id")
     private String hubId;

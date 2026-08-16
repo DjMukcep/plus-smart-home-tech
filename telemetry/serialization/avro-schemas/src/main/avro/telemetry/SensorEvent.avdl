@@ -15,7 +15,7 @@ protocol SensorEventProtocol {
 	record MotionSensorAvro {
 		int link_quality;
 		boolean motion;
-		int voltage;
+			int voltage;
 	}
 
 	record SwitchSensorAvro {

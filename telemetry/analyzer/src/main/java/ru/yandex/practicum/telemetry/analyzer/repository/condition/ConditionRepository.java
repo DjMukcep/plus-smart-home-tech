@@ -1,4 +1,4 @@
-package ru.yandex.practicum.telemetry.analyzer.repository;
+package ru.yandex.practicum.telemetry.analyzer.repository.condition;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
