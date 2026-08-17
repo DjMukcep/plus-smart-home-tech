@@ -23,5 +23,6 @@ kafka:
     snapshots: telemetry.snapshots.v1
     hubs: telemetry.hubs.v1
   consumer:
-    group-id: telemetry-analyzer-group
+    hubs-group-id: telemetry-analyzer-hubs-group
+    snapshots-group-id: telemetry-analyzer-snapshots-group
     auto-commit: false

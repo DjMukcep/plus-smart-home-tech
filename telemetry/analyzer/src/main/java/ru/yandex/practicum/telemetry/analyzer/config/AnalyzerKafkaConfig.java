@@ -26,7 +26,7 @@ public class AnalyzerKafkaConfig {
     public Consumer<String, HubEventAvro> hubEventConsumer(KafkaConsumerProperties consumerProperties) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerProperties.groupId());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerProperties.hubsGroupId());
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, consumerProperties.autoCommit());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, HubEventDeserializer.class);
@@ -37,7 +37,7 @@ public class AnalyzerKafkaConfig {
     public Consumer<String, SensorsSnapshotAvro> sensorsSnapshotConsumer(KafkaConsumerProperties consumerProperties) {
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerProperties.groupId());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerProperties.snapshotsGroupId());
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, consumerProperties.autoCommit());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SensorSnapshotDeserializer.class);

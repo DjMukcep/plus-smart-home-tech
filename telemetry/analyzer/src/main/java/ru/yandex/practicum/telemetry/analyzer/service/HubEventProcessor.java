@@ -76,12 +76,8 @@ public class HubEventProcessor implements Runnable {
     }
 
     private void closeResources() {
-        try {
-            consumer.commitSync();
-        } finally {
-            log.info("Закрываем консьюмер");
-            consumer.close();
-        }
+        log.info("Закрываем консьюмер");
+        consumer.close();
     }
 
     private void processRecords(
@@ -124,8 +120,10 @@ public class HubEventProcessor implements Runnable {
     }
 
     private void processDeviceAddedEvent(String hubId,DeviceAddedEventAvro event) {
-        Sensor sensor = getSensor(hubId, event);
-        sensorRepository.save(sensor);
+        if (!sensorRepository.existsById(event.getId())) {
+            Sensor sensor = getSensor(hubId, event);
+            sensorRepository.save(sensor);
+        }
     }
 
     private Sensor getSensor(String hubId, DeviceAddedEventAvro event) {
@@ -140,8 +138,19 @@ public class HubEventProcessor implements Runnable {
         sensor.ifPresent(sensorRepository::delete);
     }
 
-    private void processScenarioAddedEvent(String hubId, ScenarioAddedEventAvro event) {
-        Scenario scenario = getScenario(hubId,event);
+    void processScenarioAddedEvent(String hubId, ScenarioAddedEventAvro event) {
+        Scenario scenario = scenarioRepository.findByHubIdAndName(hubId, event.getName())
+                .orElseGet(() -> this.getScenario(hubId, event));
+
+        if (scenario.getId() != null) {
+            Scenario updatedScenario = getScenario(hubId, event);
+
+            scenario.getActions().clear();
+            scenario.getActions().putAll(updatedScenario.getActions());
+
+            scenario.getConditions().clear();
+            scenario.getConditions().putAll(updatedScenario.getConditions());
+        }
         scenarioRepository.save(scenario);
     }
 

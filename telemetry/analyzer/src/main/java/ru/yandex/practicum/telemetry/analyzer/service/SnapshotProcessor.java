@@ -73,12 +73,8 @@ public class SnapshotProcessor {
     }
 
     private void closeResources() {
-        try {
-            consumer.commitSync();
-        } finally {
-            log.info("Закрываем консьюмер");
-            consumer.close();
-        }
+        log.info("Закрываем консьюмер");
+        consumer.close();
     }
 
     private void processRecords(ConsumerRecords<String, SensorsSnapshotAvro> records) {
