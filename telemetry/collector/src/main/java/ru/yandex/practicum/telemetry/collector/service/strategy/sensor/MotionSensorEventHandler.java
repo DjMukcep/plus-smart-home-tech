@@ -1,30 +1,25 @@
 package ru.yandex.practicum.telemetry.collector.service.strategy.sensor;
 
-import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.Producer;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import ru.yandex.practicum.grpc.telemetry.event.MotionSensorProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import ru.yandex.practicum.telemetry.collector.model.sensor_event.MotionSensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.sensor_event.SensorEventType;
-import ru.yandex.practicum.telemetry.collector.service.strategy.Event;
 
-@Component
-public class MotionSensorEventHandler extends Event implements SensorEventHandler {
+import ru.yandex.practicum.telemetry.collector.service.strategy.KafkaEventSender;
 
-    public MotionSensorEventHandler(Producer<String, SpecificRecordBase> producer) {
-        super(producer);
-    }
+@Component(value = "MOTION_SENSOR_EVENT")
+@RequiredArgsConstructor
+public class MotionSensorEventHandler implements SensorEventHandler {
+
+    private final KafkaEventSender eventSender;
 
     @Override
-    public SensorEventType getSensorEventType() {
-        return SensorEventType.MOTION_SENSOR_EVENT;
-    }
-
-    @Override
-    public void handle(SensorEvent sensorEvent, String topic) {
-        MotionSensorEvent event = (MotionSensorEvent) sensorEvent;
+    public void handle(SensorEventProto sensorEvent, String topic) {
+        MotionSensorProto event = sensorEvent.getMotionSensorEvent();
 
         MotionSensorAvro payload = MotionSensorAvro.newBuilder()
                 .setLinkQuality(event.getLinkQuality())
@@ -32,7 +27,7 @@ public class MotionSensorEventHandler extends Event implements SensorEventHandle
                 .setVoltage(event.getVoltage())
                 .build();
 
-        SensorEventAvro message = createSensorEvent(event,payload);
-        sendMessage(topic, message.getHubId(), message.getTimestamp(), message);
+        SensorEventAvro message = createSensorEvent(sensorEvent,payload);
+        eventSender.sendMessage(topic, message.getHubId(), message.getTimestamp(), message);
     }
 }
