@@ -1,14 +1,5 @@
-server:
-  port: 59092
-
 spring:
-  application: telemetry-aggregator
-
-kafka:
-  bootstrap-servers: localhost:9092
-  topics:
-    sensors: telemetry.sensors.v1
-    snapshots: telemetry.snapshots.v1
-  consumer:
-    group-id: telemetry-aggregator-group
-    auto-commit: false
+  application:
+    name: aggregator
+  config:
+    import: configserver:http://localhost:8888
