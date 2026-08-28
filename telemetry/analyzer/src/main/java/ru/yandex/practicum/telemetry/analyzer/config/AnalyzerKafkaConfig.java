@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.yandex.practicum.deserializer.HubEventDeserializer;
+import ru.yandex.practicum.deserializer.SensorSnapshotDeserializer;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import ru.yandex.practicum.telemetry.aggregator.deserializer.HubEventDeserializer;
-import ru.yandex.practicum.telemetry.aggregator.deserializer.SensorSnapshotDeserializer;
 
 import java.util.Properties;
 
