@@ -19,8 +19,6 @@
         <module>telemetry</module>
         <module>infra</module>
         <module>commerce</module>
-        <module>infra/config-server</module>
-        <module>telemetry/common</module>
     </modules>
 
     <properties>
