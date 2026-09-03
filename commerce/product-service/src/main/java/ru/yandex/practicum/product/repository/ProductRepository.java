@@ -1,0 +1,29 @@
+package ru.yandex.practicum.product.repository;
+
+import lombok.NonNull;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.yandex.practicum.product.entity.Product;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    @EntityGraph(attributePaths = "category")
+    List<Product> getProductsByCategoryId(Long categoryId);
+
+    @NonNull
+    @EntityGraph(attributePaths = "category")
+    List<Product> findAll();
+
+    @EntityGraph(attributePaths = "category")
+    List<Product> findAllByIsActive(Boolean isActive);
+
+    @NonNull
+    @EntityGraph(attributePaths = "category")
+    Optional<Product> findById(@NonNull Long id);
+
+    @EntityGraph(attributePaths = "category")
+    List<Product> findAllByNameContainsIgnoreCase(String name);
+}
