@@ -37,7 +37,7 @@ public class Product {
 
     @Builder.Default
     @Column(name = "is_active")
-    private boolean isActive = true; //? изначально товар в каком состоянии
+    private boolean isActive = true;
 
     @Override
     public boolean equals(Object o) {

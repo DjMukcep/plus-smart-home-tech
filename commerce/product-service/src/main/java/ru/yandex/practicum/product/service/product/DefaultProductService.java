@@ -49,7 +49,7 @@ public class DefaultProductService implements ProductService {
 
     @Override
     public List<Product> getProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllByIsActive(true);
     }
 
     @Override

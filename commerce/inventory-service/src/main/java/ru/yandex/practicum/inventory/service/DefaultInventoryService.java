@@ -8,6 +8,7 @@ import ru.yandex.practicum.inventory.dto.ReserveRequest;
 import ru.yandex.practicum.inventory.dto.ReserveResponse;
 import ru.yandex.practicum.inventory.dto.UpdateInventoryRequest;
 import ru.yandex.practicum.inventory.entity.Inventory;
+import ru.yandex.practicum.inventory.exception.DuplicateException;
 import ru.yandex.practicum.inventory.exception.InsufficientStockException;
 import ru.yandex.practicum.inventory.exception.NotFoundException;
 import ru.yandex.practicum.inventory.mapper.InventoryMapper;
@@ -27,6 +28,9 @@ public class DefaultInventoryService implements InventoryService {
     @Override
     @Transactional
     public Inventory addInventoryRecord(ReserveRequest request) {
+        if (inventoryRepository.existsByProductId(request.productId())) {
+            throw new DuplicateException(String.format("Product with id %s already exists", request.productId()));
+        }
         Inventory record = InventoryMapper.toEntity(request);
         record = inventoryRepository.save(record);
         log.info("Add inventory record: {}", record);
