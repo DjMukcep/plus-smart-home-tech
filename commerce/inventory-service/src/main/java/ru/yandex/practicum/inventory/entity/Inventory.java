@@ -20,7 +20,7 @@ public class Inventory {
     @Version
     private Long version;
 
-    @Column(name = "product_id", nullable = false)
+    @Column(name = "product_id", nullable = false, unique = true)
     private Long productId;
 
     @Column(nullable = false)

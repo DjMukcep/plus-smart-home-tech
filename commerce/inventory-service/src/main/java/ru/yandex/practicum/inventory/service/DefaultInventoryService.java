@@ -42,6 +42,11 @@ public class DefaultInventoryService implements InventoryService {
     @Transactional
     public Inventory updateInventoryRecord(UpdateInventoryRequest request) {
         Inventory record = getInventoryRecordByProductId(request.productId());
+
+        if (request.quantity() < record.getReservedQuantity()) {
+            throw new InsufficientStockException("New quantity cannot be less than the reserved quantity");
+        }
+
         record.setQuantity(request.quantity());
         log.info("Update inventory record: {}", record);
 

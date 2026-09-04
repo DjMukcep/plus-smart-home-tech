@@ -11,19 +11,19 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @EntityGraph(attributePaths = "category")
-    List<Product> getProductsByCategoryId(Long categoryId);
+    List<Product> getProductsByCategoryIdAndIsActive(@NonNull Long categoryId, boolean active);
 
     @NonNull
     @EntityGraph(attributePaths = "category")
     List<Product> findAll();
 
     @EntityGraph(attributePaths = "category")
-    List<Product> findAllByIsActive(Boolean isActive);
+    List<Product> findAllByIsActive(boolean isActive);
 
     @NonNull
     @EntityGraph(attributePaths = "category")
     Optional<Product> findById(@NonNull Long id);
 
     @EntityGraph(attributePaths = "category")
-    List<Product> findAllByNameContainsIgnoreCase(String name);
+    List<Product> findAllByNameContainsIgnoreCaseAndIsActive(@NonNull String name, boolean active);
 }

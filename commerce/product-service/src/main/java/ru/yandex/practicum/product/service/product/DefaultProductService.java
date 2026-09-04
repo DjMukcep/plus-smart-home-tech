@@ -60,12 +60,12 @@ public class DefaultProductService implements ProductService {
 
     @Override
     public List<Product> getProductsByCategoryId(Long categoryId) {
-        return productRepository.getProductsByCategoryId(categoryId);
+        return productRepository.getProductsByCategoryIdAndIsActive(categoryId, true);
     }
 
     @Override
     public List<Product> searchByName(String name) {
-        return productRepository.findAllByNameContainsIgnoreCase(name);
+        return productRepository.findAllByNameContainsIgnoreCaseAndIsActive(name, true);
     }
 
     private void updateProductFromUpdateRequest(UpdateProductRequest request, Product product) {

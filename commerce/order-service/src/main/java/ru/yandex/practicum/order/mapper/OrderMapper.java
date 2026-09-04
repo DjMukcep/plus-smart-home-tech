@@ -15,7 +15,7 @@ import java.util.List;
 @UtilityClass
 public class OrderMapper {
 
-    public static Order toOrder(CreateOrderRequest request, Customer customer) {
+    public static Order toOrder(Customer customer) {
         return Order.builder()
                 .customer(customer)
                 .status(OrderStatus.CREATED)

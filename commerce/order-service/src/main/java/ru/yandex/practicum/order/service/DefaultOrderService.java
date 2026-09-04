@@ -27,7 +27,7 @@ public class DefaultOrderService implements OrderService {
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
         Customer customer = saveCustomer(request);
-        Order order = OrderMapper.toOrder(request, customer);
+        Order order = OrderMapper.toOrder(customer);
 
         order = orderRepository.save(order);
 
