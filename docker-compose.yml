@@ -53,3 +53,59 @@ services:
     #      - postgres:/data/postgres
     ports:
       - "5432:5432"
+
+  postgres-product:
+    image: postgres:16.1
+    container_name: postgres-product
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product
+      POSTGRES_PASSWORD: 12345
+#    volumes:
+#      - product-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -q  -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    ports:
+      - "5433:5432"
+
+  postgres-inventory:
+    image: postgres:16.1
+    container_name: postgres-inventory
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: inventory
+      POSTGRES_PASSWORD: 12345
+#    volumes:
+#      - inventory-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    ports:
+      - "5434:5432"
+
+  postgres-order:
+    image: postgres:16.1
+    container_name: postgres-order
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order
+      POSTGRES_PASSWORD: 12345
+#    volumes:
+#      - order-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    ports:
+      - "5435:5432"
+
+#volumes: # ничего в базе между запусками не храним пока - чистый лист на каждый старт
+#  product-db-data:
+#  inventory-db-data:
+#  order-db-data:
