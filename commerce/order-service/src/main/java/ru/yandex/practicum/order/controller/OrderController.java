@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.dto.OrderDto;
 import ru.yandex.practicum.order.mapper.OrderMapper;
+import ru.yandex.practicum.order.service.OrderOrchestrationService;
 import ru.yandex.practicum.order.service.OrderService;
 
 import java.util.List;
@@ -20,11 +21,12 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderOrchestrationService orderOrchestrationService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderDto addOrder(@RequestBody @Valid CreateOrderRequest request) {
-        return OrderMapper.toOrderDto(orderService.createOrder(request));
+        return OrderMapper.toOrderDto(orderOrchestrationService.createOrder(request));
     }
 
     @GetMapping(path = "/{id}")

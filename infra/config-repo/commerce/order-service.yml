@@ -16,3 +16,17 @@ spring:
   sql:
     init:
       mode: always
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 3000
+          inventory-service:
+            loggerLevel: basic
+
+logging:
+  level:
+    ru.yandex.practicum.order.feign.InventoryClient: DEBUG

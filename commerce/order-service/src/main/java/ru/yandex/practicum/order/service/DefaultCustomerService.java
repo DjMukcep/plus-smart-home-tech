@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.order.entity.Customer;
 import ru.yandex.practicum.order.repository.CustomerRepository;
 
+import java.util.Optional;
+
 @Transactional
 @Service
 @RequiredArgsConstructor
@@ -17,9 +19,15 @@ public class DefaultCustomerService implements CustomerService {
 
     @Override
     public Customer save(Customer customer) {
-        Customer savedCustomer = customerRepository.save(customer);
-        log.info("New customer: {}", savedCustomer);
+        return findByEmail(customer.getEmail())
+                .orElseGet(() -> {
+                    Customer savedCustomer = customerRepository.save(customer);
+                    log.info("New customer: {}", savedCustomer);
+                    return savedCustomer;
+                });
+    }
 
-        return savedCustomer;
+    public Optional<Customer> findByEmail(String email) {
+        return customerRepository.findByEmail(email);
     }
 }
