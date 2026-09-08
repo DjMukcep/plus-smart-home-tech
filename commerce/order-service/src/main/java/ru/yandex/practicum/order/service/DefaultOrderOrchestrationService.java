@@ -12,7 +12,9 @@ import ru.yandex.practicum.order.exception.OrderProcessingException;
 import ru.yandex.practicum.order.feign.InventoryClient;
 import ru.yandex.practicum.order.feign.ProductClient;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,17 +32,23 @@ public class DefaultOrderOrchestrationService implements OrderOrchestrationServi
                 .collect(Collectors.groupingBy(OrderItemRequest::productId,
                         Collectors.summingInt(OrderItemRequest::quantity)));
 
-        validateProducts(items);
+        List<OrderItemRequest> itemRequests = validateProducts(items);
         reserveItems(items);
 
-        return orderService.saveOrder(request);
+        return orderService.saveOrder(getFullOrderRequest(itemRequests, request));
     }
 
-    private void validateProducts(Map<Long, Integer> items) {
+    private CreateOrderRequest getFullOrderRequest(List<OrderItemRequest> items,
+                                                   CreateOrderRequest orderRequest) {
+        return new CreateOrderRequest(orderRequest.customerName(), orderRequest.customerEmail(), items);
+    }
+
+    private List<OrderItemRequest> validateProducts(Map<Long, Integer> items) {
+        List<OrderItemRequest> itemRequests = new ArrayList<>();
         items.forEach((productId, quantity) -> {
             try {
                 ProductDto product = productClient.getProductById(productId);
-
+                itemRequests.add(getOrderItemRequest(product, quantity));
                 if (!product.active()) {
                     throw new OrderProcessingException("Товар снят с продажи");
                 }
@@ -48,6 +56,11 @@ public class DefaultOrderOrchestrationService implements OrderOrchestrationServi
                 throw mapProductException(e, productId);
             }
         });
+        return itemRequests;
+    }
+
+    private OrderItemRequest getOrderItemRequest(ProductDto productDto, Integer quantity) {
+        return new OrderItemRequest(productDto.id(),productDto.name(),quantity,productDto.price());
     }
 
     private void reserveItems(Map<Long, Integer> items) {

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.order.entity.Customer;
 import ru.yandex.practicum.order.entity.OrderItem;
+import ru.yandex.practicum.order.entity.OrderStatus;
 import ru.yandex.practicum.order.mapper.OrderMapper;
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.entity.Order;
@@ -33,6 +34,7 @@ public class DefaultOrderService implements OrderService {
 
         List<OrderItem> items = OrderMapper.toOrderItems(request, order);
         order.setItems(items);
+        order.setStatus(OrderStatus.CONFIRMED);
         log.info("Save new order: {}", order);
 
         return order;
