@@ -26,7 +26,7 @@ public class DefaultOrderService implements OrderService {
 
     @Override
     @Transactional
-    public Order saveOrder(CreateOrderRequest request) {
+    public Order saveOrder(CreateOrderRequest request, OrderStatus status) {
         Customer customer = saveCustomer(request);
         Order order = OrderMapper.toOrder(customer);
 
@@ -34,7 +34,7 @@ public class DefaultOrderService implements OrderService {
 
         List<OrderItem> items = OrderMapper.toOrderItems(request, order);
         order.setItems(items);
-        order.setStatus(OrderStatus.CONFIRMED);
+        order.setStatus(status);
         log.info("Save new order: {}", order);
 
         return order;

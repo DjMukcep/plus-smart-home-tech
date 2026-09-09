@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS order_items (
     product_id BIGINT NOT NULL,
     product_name VARCHAR NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
-    price NUMERIC(10, 2) NOT NULL CHECK (price > 0),
+    price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
     CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id)
 );
