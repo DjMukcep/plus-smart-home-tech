@@ -54,8 +54,11 @@ public class DefaultProductService implements ProductService {
 
     @Override
     public Product getProduct(Long id) {
-        return productRepository.findById(id)
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found with id " + id));
+        log.info("Found product {}", product);
+
+        return product;
     }
 
     @Override

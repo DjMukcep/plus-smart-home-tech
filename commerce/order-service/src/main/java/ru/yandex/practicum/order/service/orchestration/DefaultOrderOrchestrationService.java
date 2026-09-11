@@ -1,7 +1,8 @@
-package ru.yandex.practicum.order.service;
+package ru.yandex.practicum.order.service.orchestration;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
@@ -15,7 +16,8 @@ import ru.yandex.practicum.order.exception.OrderProcessingException;
 import ru.yandex.practicum.order.exception.ProductServiceUnavailableException;
 import ru.yandex.practicum.order.feign.InventoryClient;
 import ru.yandex.practicum.order.feign.ProductClient;
-import ru.yandex.practicum.order.service.fallback.ServiceCallResult;
+import ru.yandex.practicum.order.service.order.OrderService;
+import ru.yandex.practicum.order.service.order.StatusDetails;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DefaultOrderOrchestrationService implements OrderOrchestrationService {
 
@@ -40,9 +43,9 @@ public class DefaultOrderOrchestrationService implements OrderOrchestrationServi
 
             ProductValidationResult validationResult = validateProducts(items);
             boolean invServiceDegraded = reserveItems(items);
-            OrderStatus status = (validationResult.pendingConfirmation() || invServiceDegraded)
-                    ? OrderStatus.PENDING_CONFIRMATION
-                    : OrderStatus.CONFIRMED;
+            StatusDetails status = (validationResult.pendingConfirmation() || invServiceDegraded)
+                    ? new StatusDetails(OrderStatus.PENDING_CONFIRMATION,"ожидает подтверждение")
+                    : new StatusDetails(OrderStatus.CONFIRMED, "подтвержден");
             CreateOrderRequest orderRequest = getFullOrderRequest(validationResult.items(),request);
 
             return orderService.saveOrder(orderRequest, status);
@@ -74,9 +77,10 @@ public class DefaultOrderOrchestrationService implements OrderOrchestrationServi
 
         private ServiceCallResult<ProductDto> getProduct(Long productId) {
             try {
-                return new ServiceCallResult.Success<>(
-                        productClient.getProductById(productId)
-                );
+                ProductDto productDto = productClient.getProductById(productId);
+
+                return new ServiceCallResult.Success<>(productDto);
+
             } catch (ProductServiceUnavailableException exception) {
                 return new ServiceCallResult.Degraded<>(
                         "Каталог временно недоступен"

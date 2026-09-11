@@ -1,4 +1,4 @@
-package ru.yandex.practicum.order.service;
+package ru.yandex.practicum.order.service.orchestration;
 
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.entity.Order;

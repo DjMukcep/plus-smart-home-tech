@@ -1,4 +1,4 @@
-package ru.yandex.practicum.order.service;
+package ru.yandex.practicum.order.service.customer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

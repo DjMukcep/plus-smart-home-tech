@@ -1,4 +1,4 @@
-package ru.yandex.practicum.order.service;
+package ru.yandex.practicum.order.service.customer;
 
 import ru.yandex.practicum.order.entity.Customer;
 

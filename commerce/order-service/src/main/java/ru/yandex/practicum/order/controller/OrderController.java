@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.dto.OrderDto;
 import ru.yandex.practicum.order.mapper.OrderMapper;
-import ru.yandex.practicum.order.service.OrderOrchestrationService;
-import ru.yandex.practicum.order.service.OrderService;
+import ru.yandex.practicum.order.service.orchestration.OrderOrchestrationService;
+import ru.yandex.practicum.order.service.order.OrderService;
 
 import java.util.List;
 

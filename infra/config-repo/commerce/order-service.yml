@@ -28,6 +28,8 @@ spring:
             readTimeout: 3000
           inventory-service:
             loggerLevel: basic
+          product-service:
+            loggerLevel: basic
 
 resilience4j:
   circuitbreaker:
@@ -44,4 +46,5 @@ resilience4j:
 
 logging:
   level:
+    ru.yandex.practicum.order.feign.ProductClient: DEBUG
     ru.yandex.practicum.order.feign.InventoryClient: DEBUG

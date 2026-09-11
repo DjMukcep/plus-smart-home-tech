@@ -1,5 +1,6 @@
 package ru.yandex.practicum.order.service.fallback;
 
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -15,11 +16,20 @@ public class ProductClientFallbackFactory implements FallbackFactory<ProductClie
     @Override
     public ProductClient create(Throwable cause) {
         return productId -> {
+
+            if (cause instanceof FeignException feignException
+                    && (feignException.status() == 404
+                    || feignException.status() == 409)) {
+
+                throw feignException;
+            }
+
             log.warn(
-                    "product-service недоступен при запросе товара id={}",
+                    "product-service недоступен при запросе товара id={}: {}",
                     productId,
-                    cause
+                    cause.getMessage()
             );
+
             throw new ProductServiceUnavailableException(productId, cause);
         };
     }

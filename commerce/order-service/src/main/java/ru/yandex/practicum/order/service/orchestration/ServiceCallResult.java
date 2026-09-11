@@ -1,4 +1,4 @@
-package ru.yandex.practicum.order.service.fallback;
+package ru.yandex.practicum.order.service.orchestration;
 
 public sealed interface ServiceCallResult<T>
         permits ServiceCallResult.Success,

@@ -19,7 +19,7 @@ public class OrderMapper {
         return Order.builder()
                 .customer(customer)
                 .status(OrderStatus.CREATED)
-                .statusDetails("string")
+                .statusDetails("создан")
                 .build();
     }
 

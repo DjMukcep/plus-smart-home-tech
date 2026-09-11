@@ -1,4 +1,4 @@
-package ru.yandex.practicum.order.service;
+package ru.yandex.practicum.order.service.order;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.order.entity.Customer;
 import ru.yandex.practicum.order.entity.OrderItem;
-import ru.yandex.practicum.order.entity.OrderStatus;
 import ru.yandex.practicum.order.mapper.OrderMapper;
 import ru.yandex.practicum.order.dto.CreateOrderRequest;
 import ru.yandex.practicum.order.entity.Order;
 import ru.yandex.practicum.order.exception.NotFoundException;
 import ru.yandex.practicum.order.repository.OrderRepository;
+import ru.yandex.practicum.order.service.customer.CustomerService;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class DefaultOrderService implements OrderService {
 
     @Override
     @Transactional
-    public Order saveOrder(CreateOrderRequest request, OrderStatus status) {
+    public Order saveOrder(CreateOrderRequest request, StatusDetails statusDetails) {
         Customer customer = saveCustomer(request);
         Order order = OrderMapper.toOrder(customer);
 
@@ -34,7 +34,8 @@ public class DefaultOrderService implements OrderService {
 
         List<OrderItem> items = OrderMapper.toOrderItems(request, order);
         order.setItems(items);
-        order.setStatus(status);
+        order.setStatus(statusDetails.status());
+        order.setStatusDetails(statusDetails.message());
         log.info("Save new order: {}", order);
 
         return order;
