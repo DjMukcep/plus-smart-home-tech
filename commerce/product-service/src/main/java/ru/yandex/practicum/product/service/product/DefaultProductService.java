@@ -2,6 +2,8 @@ package ru.yandex.practicum.product.service.product;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.product.dto.CreateProductRequest;
@@ -38,6 +40,7 @@ public class DefaultProductService implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = "products", key = "#id")
     @Transactional
     public Product updateProduct(UpdateProductRequest request, Long id) {
         Product product = getProduct(id);
@@ -52,6 +55,7 @@ public class DefaultProductService implements ProductService {
         return productRepository.findAllByIsActive(true);
     }
 
+    @Cacheable(value = "products", key = "#id")
     @Override
     public Product getProduct(Long id) {
         Product product = productRepository.findById(id)
