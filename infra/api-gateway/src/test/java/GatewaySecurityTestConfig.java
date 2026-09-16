@@ -26,6 +26,8 @@ public class GatewaySecurityTestConfig {
                         request -> ServerResponse.ok().build())
                 .andRoute(GET("/api/orders"),
                         request -> ServerResponse.ok().build())
+                .andRoute(GET("/api/orders/1"),
+                        request -> ServerResponse.ok().build())
                 .andRoute(POST("/api/orders"),
                         request -> ServerResponse.ok().build())
                 .andRoute(GET("/api/orders/1"),

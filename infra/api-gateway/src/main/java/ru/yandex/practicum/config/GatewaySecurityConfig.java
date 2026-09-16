@@ -31,6 +31,13 @@ public class GatewaySecurityConfig {
                         .pathMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
 
+                        .pathMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**"
+                        )
+                        .permitAll()
+
                         .pathMatchers(HttpMethod.GET,
                                 "/api/products/**", "/api/categories/**", "/api/inventory/**"
                         ).permitAll()
@@ -41,7 +48,7 @@ public class GatewaySecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/orders/by-email")
                         .hasRole("USER")
 
-                        .pathMatchers(HttpMethod.GET, "/api/orders/*")
+                        .pathMatchers(HttpMethod.GET, "/api/orders/{id}")
                         .hasRole("USER")
 
                         .pathMatchers(HttpMethod.GET, "/api/orders")
@@ -65,6 +72,8 @@ public class GatewaySecurityConfig {
                         .anyExchange().denyAll()
                 )
                 .httpBasic(Customizer.withDefaults())
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .cors(Customizer.withDefaults())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();

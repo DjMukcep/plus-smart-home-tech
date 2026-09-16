@@ -69,6 +69,15 @@ class GatewaySecurityConfigTest {
     }
 
     @Test
+    void getOrder_asUser_isAllowed() {
+        webTestClient.get()
+                .uri("/api/orders/1")
+                .headers(httpHeaders ->  httpHeaders.setBasicAuth("ivan", "ivan"))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
     void getOrders_asAdmin_isAllowed() {
         webTestClient.get()
                 .uri("/api/orders")
