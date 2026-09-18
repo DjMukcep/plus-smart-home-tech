@@ -2,6 +2,7 @@ package ru.yandex.practicum.product.service.category;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.product.dto.CreateCategoryRequest;
@@ -36,6 +37,7 @@ public class DefaultCategoryService implements CategoryService {
     }
 
     @Override
+    @Cacheable(value = "categories", key = "#categoryId")
     public Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category not found!"));

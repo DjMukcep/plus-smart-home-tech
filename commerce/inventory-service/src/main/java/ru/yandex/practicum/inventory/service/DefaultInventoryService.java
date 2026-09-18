@@ -8,6 +8,7 @@ import ru.yandex.practicum.inventory.dto.ReserveRequest;
 import ru.yandex.practicum.inventory.dto.ReserveResponse;
 import ru.yandex.practicum.inventory.dto.UpdateInventoryRequest;
 import ru.yandex.practicum.inventory.entity.Inventory;
+import ru.yandex.practicum.inventory.exception.CancellationQuantityExceededException;
 import ru.yandex.practicum.inventory.exception.DuplicateException;
 import ru.yandex.practicum.inventory.exception.InsufficientStockException;
 import ru.yandex.practicum.inventory.exception.NotFoundException;
@@ -73,6 +74,26 @@ public class DefaultInventoryService implements InventoryService {
         }
 
         throw new InsufficientStockException("Not enough stock");
+    }
+
+    @Override
+    @Transactional
+    public ReserveResponse releaseInventoryRecord(ReserveRequest request) {
+        Inventory record = getInventoryRecordByProductId(request.productId());
+
+        int requestQuantity = request.quantity();
+        int recQuantity = record.getQuantity();
+        int recReservedQuantity = record.getReservedQuantity();
+
+        if (recReservedQuantity >= requestQuantity) {
+            record.setReservedQuantity(recReservedQuantity - requestQuantity);
+            int recAvailableQuantity = recQuantity - record.getReservedQuantity();
+            log.info("Release inventory record: {}", record);
+            return new ReserveResponse(
+                    true, recAvailableQuantity, "Товар снова доступен для заказа");
+        }
+
+        throw new CancellationQuantityExceededException("Cancellation quantity exceeds reserved quantity");
     }
 
     @Override

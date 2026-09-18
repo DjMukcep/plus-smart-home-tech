@@ -34,6 +34,11 @@ public class InventoryController {
         return inventoryService.reserveInventoryRecord(request);
     }
 
+    @PostMapping(path = "/release")
+    public ReserveResponse releaseInventoryRecord(@RequestBody @Valid ReserveRequest request) {
+        return inventoryService.releaseInventoryRecord(request);
+    }
+
     @PutMapping
     public InventoryDto updateInventoryRecord(@RequestBody @Valid UpdateInventoryRequest request) {
         return InventoryMapper.toDto(inventoryService.updateInventoryRecord(request));

@@ -15,6 +15,8 @@ public interface InventoryService {
 
     ReserveResponse reserveInventoryRecord(ReserveRequest request);
 
+    ReserveResponse releaseInventoryRecord(ReserveRequest request);
+
     Inventory getInventoryRecordByProductId(Long id);
 
     List<Inventory> getInventoryRecords();

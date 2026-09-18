@@ -38,6 +38,13 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
+    @ExceptionHandler(CancellationQuantityExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleCancellationQuantityException(CancellationQuantityExceededException e) {
+        log.warn("Недостаточно зарезервированного товара: {}", e.getMessage());
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+    }
+
     /**
      * Конфликт оптимистичной блокировки: два запроса одновременно изменили одну запись.
      * Клиент должен повторить запрос.
